@@ -95,6 +95,51 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
+
+  .export-btn {
+    padding: 8px 18px; border-radius: 8px; border: 1px solid var(--accent2);
+    background: transparent; color: var(--accent2); font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; letter-spacing: .5px;
+    display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  }
+  .export-btn:hover { background: var(--accent2); color: #fff; }
+  .export-btn svg { flex-shrink: 0; }
+
+  @media print {
+    body { background: #fff; color: #111; }
+    body::before { display: none; }
+    .controls, .stats-bar, .export-btn { display: none !important; }
+    .container { padding: 20px; max-width: 100%; }
+    header { margin-bottom: 24px; }
+    h1 { font-size: 2rem; color: #111; }
+    h1 span { -webkit-text-fill-color: #5b21b6; background: none; color: #5b21b6; }
+    .logo-line { -webkit-text-fill-color: #5b21b6; color: #5b21b6; }
+    .subtitle { color: #555; }
+    .category-section { margin-bottom: 24px; page-break-inside: avoid; }
+    .category-header { border-bottom: 1px solid #ddd; }
+    .category-header h2 { color: #555; }
+    .cat-count { background: #eee; color: #555; }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+    .card {
+      background: #fff; border: 1px solid #ddd; border-radius: 8px;
+      padding: 12px 14px; page-break-inside: avoid; box-shadow: none;
+      transform: none !important;
+    }
+    .card::before { display: none; }
+    .card-name { color: #111; font-size: 13px; }
+    .badge { border: 1px solid #ddd; }
+    .card-desc { color: #555; font-size: 11px; }
+    .card-syntax {
+      background: #f5f5f5; border: 1px solid #ddd; font-size: 10px;
+      color: #111; padding: 7px 10px;
+    }
+    .card-syntax .kw { color: #5b21b6; }
+    .card-syntax .fn { color: #0369a1; }
+    .card-syntax .str { color: #065f46; }
+    .card-syntax .cm { color: #888; }
+    .card-extra { display: none !important; }
+    ::-webkit-scrollbar { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -115,6 +160,10 @@
   </div>
   <div class="stats-bar">
     <span class="count-label">Showing <strong id="visible-count">0</strong> of <strong id="total-count">0</strong> entries</span>
+    <button class="export-btn" onclick="window.print()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Export PDF
+    </button>
   </div>
   <div id="glossary"></div>
   <div class="no-results" id="no-results">No results found for your search.</div>
