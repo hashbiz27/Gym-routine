@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Glossary</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e2d47;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --warn: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+  }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 400;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+    align-items: center;
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  input[type="search"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    padding: 12px 14px 12px 42px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="search"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  }
+
+  input[type="search"]::placeholder { color: var(--muted); }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 4px;
+  }
+
+  .count-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .count-label strong { color: var(--accent); }
+
+  /* Categories */
+  .category-section { margin-bottom: 40px; }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .category-header h2 {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .category-header .cat-count {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(0,212,255,0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .card-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .card-syntax {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .card-syntax .kw { color: var(--accent2); font-weight: 600; }
+  .card-syntax .fn { color: var(--accent); }
+  .card-syntax .str { color: var(--accent3); }
+  .card-syntax .cm { color: var(--muted); font-style: italic; }
+
+  /* Expanded card */
+  .card-extra {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card.open .card-extra { display: block; }
+
+  .card-example-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    display: none;
+  }
+
+  .no-results.show { display: block; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo-line">⬡ Reference v1.0</div>
+    <h1>SQL <span>Glossary</span></h1>
+    <p class="subtitle">// Complete syntax reference · click any card to expand</p>
+  </header>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="search" id="search" placeholder="Search functions, keywords..." autocomplete="off">
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-cat="all">All</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <span class="count-label">Showing <strong id="visible-count">0</strong> of <strong id="total-count">0</strong> entries</span>
+  </div>
+
+  <div id="glossary"></div>
+  <div class="no-results" id="no-results">No results found for your search.</div>
+</div>
+
+<script>
+const CATEGORIES = {
+  "DML": { color: "#00d4ff", label: "DML — Data Manipulation" },
+  "DDL": { color: "#7c3aed", label: "DDL — Data Definition" },
+  "DCL": { color: "#f59e0b", label: "DCL — Data Control" },
+  "JOINS": { color: "#10b981", label: "Joins" },
+  "AGGREGATE": { color: "#ec4899", label: "Aggregate Functions" },
+  "STRING": { color: "#3b82f6", label: "String Functions" },
+  "DATE": { color: "#f97316", label: "Date & Time Functions" },
+  "NUMERIC": { color: "#84cc16", label: "Numeric Functions" },
+  "CONVERSION": { color: "#06b6d4", label: "Conversion & Casting" },
+  "WINDOW": { color: "#8b5cf6", label: "Window Functions" },
+  "CONDITIONAL": { color: "#ef4444", label: "Conditional & Logical" },
+  "SUBQUERY": { color: "#14b8a6", label: "Subqueries & CTEs" },
+  "NULL": { color: "#a855f7", label: "NULL Handling" },
+  "SET": { color: "#f59e0b", label: "Set Operations" },
+  "ANALYTIC": { color: "#0ea5e9", label: "Analytic / Ranking" },
+  "MISC": { color: "#94a3b8", label: "Misc & Advanced" },
+};
+
+const DATA = [
+  // DML
+  { cat:"DML", name:"SELECT", desc:"Retrieves rows from one or more tables.", syntax:`<span class="kw">SELECT</span> col1, col2 <span class="kw">FROM</span> table_name\n<span class="kw">WHERE</span> condition\n<span class="kw">ORDER BY</span> col1 <span class="kw">ASC</span>;` },
+  { cat:"DML", name:"INSERT INTO", desc:"Inserts new rows into a table.", syntax:`<span class="kw">INSERT INTO</span> table_name (col1, col2)\n<span class="kw">VALUES</span> (<span class="str">'val1'</span>, <span class="str">'val2'</span>);` },
+  { cat:"DML", name:"UPDATE", desc:"Modifies existing rows in a table.", syntax:`<span class="kw">UPDATE</span> table_name\n<span class="kw">SET</span> col1 = <span class="str">'new_val'</span>\n<span class="kw">WHERE</span> condition;` },
+  { cat:"DML", name:"DELETE", desc:"Removes rows from a table.", syntax:`<span class="kw">DELETE FROM</span> table_name\n<span class="kw">WHERE</span> condition;` },
+  { cat:"DML", name:"MERGE", desc:"Upsert — inserts or updates based on a condition.", syntax:`<span class="kw">MERGE INTO</span> target t\n<span class="kw">USING</span> source s <span class="kw">ON</span> (t.id = s.id)\n<span class="kw">WHEN MATCHED THEN UPDATE SET</span> t.col = s.col\n<span class="kw">WHEN NOT MATCHED THEN INSERT</span> (id, col)\n<span class="kw">VALUES</span> (s.id, s.col);` },
+  { cat:"DML", name:"SELECT INTO", desc:"Creates a new table from a SELECT result (SQL Server / PostgreSQL).", syntax:`<span class="kw">SELECT</span> * <span class="kw">INTO</span> new_table\n<span class="kw">FROM</span> existing_table\n<span class="kw">WHERE</span> condition;` },
+  { cat:"DML", name:"TRUNCATE", desc:"Removes all rows from a table quickly without logging individual row deletes.", syntax:`<span class="kw">TRUNCATE TABLE</span> table_name;` },
+
+  // DDL
+  { cat:"DDL", name:"CREATE TABLE", desc:"Creates a new table with defined columns and constraints.", syntax:`<span class="kw">CREATE TABLE</span> employees (\n  id       <span class="kw">INT PRIMARY KEY</span>,\n  name     <span class="kw">VARCHAR</span>(100) <span class="kw">NOT NULL</span>,\n  salary   <span class="kw">DECIMAL</span>(10,2),\n  hired_on <span class="kw">DATE</span>\n);` },
+  { cat:"DDL", name:"ALTER TABLE", desc:"Modifies an existing table's structure.", syntax:`<span class="kw">ALTER TABLE</span> employees\n  <span class="kw">ADD</span> department_id <span class="kw">INT</span>;\n\n<span class="kw">ALTER TABLE</span> employees\n  <span class="kw">DROP COLUMN</span> old_col;\n\n<span class="kw">ALTER TABLE</span> employees\n  <span class="kw">MODIFY COLUMN</span> name <span class="kw">VARCHAR</span>(200);` },
+  { cat:"DDL", name:"DROP TABLE", desc:"Permanently removes a table and all its data.", syntax:`<span class="kw">DROP TABLE</span> table_name;\n<span class="kw">DROP TABLE IF EXISTS</span> table_name;` },
+  { cat:"DDL", name:"CREATE INDEX", desc:"Creates an index to speed up query performance.", syntax:`<span class="kw">CREATE INDEX</span> idx_name\n  <span class="kw">ON</span> table_name (column1, column2);` },
+  { cat:"DDL", name:"CREATE VIEW", desc:"Defines a virtual table based on a SELECT query.", syntax:`<span class="kw">CREATE VIEW</span> active_users <span class="kw">AS</span>\n  <span class="kw">SELECT</span> * <span class="kw">FROM</span> users\n  <span class="kw">WHERE</span> status = <span class="str">'active'</span>;` },
+  { cat:"DDL", name:"CREATE SEQUENCE", desc:"Creates an auto-incrementing number generator.", syntax:`<span class="kw">CREATE SEQUENCE</span> seq_name\n  <span class="kw">START WITH</span> 1\n  <span class="kw">INCREMENT BY</span> 1\n  <span class="kw">NOCACHE NOCYCLE</span>;` },
+
+  // DCL
+  { cat:"DCL", name:"GRANT", desc:"Grants privileges to a user or role.", syntax:`<span class="kw">GRANT SELECT</span>, <span class="kw">INSERT ON</span> table_name\n  <span class="kw">TO</span> username;\n\n<span class="kw">GRANT ALL PRIVILEGES ON</span> db.*\n  <span class="kw">TO</span> <span class="str">'user'</span>@<span class="str">'host'</span>;` },
+  { cat:"DCL", name:"REVOKE", desc:"Removes previously granted privileges.", syntax:`<span class="kw">REVOKE SELECT ON</span> table_name\n  <span class="kw">FROM</span> username;` },
+  { cat:"DCL", name:"COMMIT", desc:"Saves the current transaction permanently.", syntax:`<span class="kw">COMMIT</span>;` },
+  { cat:"DCL", name:"ROLLBACK", desc:"Undoes the current transaction.", syntax:`<span class="kw">ROLLBACK</span>;\n<span class="kw">ROLLBACK TO SAVEPOINT</span> sp_name;` },
+  { cat:"DCL", name:"SAVEPOINT", desc:"Sets a point within a transaction to roll back to.", syntax:`<span class="kw">SAVEPOINT</span> sp_name;` },
+
+  // JOINS
+  { cat:"JOINS", name:"INNER JOIN", desc:"Returns rows with matching values in both tables.", syntax:`<span class="kw">SELECT</span> a.*, b.col\n<span class="kw">FROM</span> table_a a\n<span class="kw">INNER JOIN</span> table_b b\n  <span class="kw">ON</span> a.id = b.a_id;` },
+  { cat:"JOINS", name:"LEFT JOIN", desc:"Returns all rows from the left table, and matched rows from the right.", syntax:`<span class="kw">SELECT</span> a.*, b.col\n<span class="kw">FROM</span> table_a a\n<span class="kw">LEFT JOIN</span> table_b b\n  <span class="kw">ON</span> a.id = b.a_id;` },
+  { cat:"JOINS", name:"RIGHT JOIN", desc:"Returns all rows from the right table, and matched rows from the left.", syntax:`<span class="kw">SELECT</span> a.*, b.col\n<span class="kw">FROM</span> table_a a\n<span class="kw">RIGHT JOIN</span> table_b b\n  <span class="kw">ON</span> a.id = b.a_id;` },
+  { cat:"JOINS", name:"FULL OUTER JOIN", desc:"Returns all rows from both tables, with NULLs where no match exists.", syntax:`<span class="kw">SELECT</span> * <span class="kw">FROM</span> table_a a\n<span class="kw">FULL OUTER JOIN</span> table_b b\n  <span class="kw">ON</span> a.id = b.a_id;` },
+  { cat:"JOINS", name:"CROSS JOIN", desc:"Returns the Cartesian product of both tables.", syntax:`<span class="kw">SELECT</span> * <span class="kw">FROM</span> table_a\n<span class="kw">CROSS JOIN</span> table_b;` },
+  { cat:"JOINS", name:"SELF JOIN", desc:"Joins a table to itself using an alias.", syntax:`<span class="kw">SELECT</span> e.name, m.name <span class="kw">AS</span> manager\n<span class="kw">FROM</span> employees e\n<span class="kw">JOIN</span> employees m <span class="kw">ON</span> e.manager_id = m.id;` },
+
+  // AGGREGATE
+  { cat:"AGGREGATE", name:"COUNT()", desc:"Counts rows or non-NULL values.", syntax:`<span class="fn">COUNT</span>(*)\n<span class="fn">COUNT</span>(DISTINCT column)` },
+  { cat:"AGGREGATE", name:"SUM()", desc:"Returns the sum of a numeric column.", syntax:`<span class="fn">SUM</span>(salary)\n<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> active <span class="kw">THEN</span> 1 <span class="kw">ELSE</span> 0 <span class="kw">END</span>)` },
+  { cat:"AGGREGATE", name:"AVG()", desc:"Returns the average of a numeric column.", syntax:`<span class="fn">AVG</span>(salary)` },
+  { cat:"AGGREGATE", name:"MIN()", desc:"Returns the minimum value.", syntax:`<span class="fn">MIN</span>(salary)\n<span class="fn">MIN</span>(hire_date)` },
+  { cat:"AGGREGATE", name:"MAX()", desc:"Returns the maximum value.", syntax:`<span class="fn">MAX</span>(salary)\n<span class="fn">MAX</span>(hire_date)` },
+  { cat:"AGGREGATE", name:"LISTAGG()", desc:"Aggregates column values into a delimited string (Oracle / Snowflake).", syntax:`<span class="fn">LISTAGG</span>(col, <span class="str">', '</span>) <span class="kw">WITHIN GROUP</span> (<span class="kw">ORDER BY</span> col)\n  <span class="kw">AS</span> combined_vals` },
+  { cat:"AGGREGATE", name:"STRING_AGG()", desc:"Aggregates strings with a separator (SQL Server / PostgreSQL).", syntax:`<span class="fn">STRING_AGG</span>(col, <span class="str">', '</span>) <span class="kw">WITHIN GROUP</span> (<span class="kw">ORDER BY</span> col)` },
+  { cat:"AGGREGATE", name:"GROUP_CONCAT()", desc:"Concatenates values in a group (MySQL).", syntax:`<span class="fn">GROUP_CONCAT</span>(col <span class="kw">ORDER BY</span> col <span class="kw">SEPARATOR</span> <span class="str">', '</span>)` },
+  { cat:"AGGREGATE", name:"GROUP BY", desc:"Groups rows that share a value for aggregation.", syntax:`<span class="kw">SELECT</span> dept, <span class="fn">SUM</span>(salary)\n<span class="kw">FROM</span> employees\n<span class="kw">GROUP BY</span> dept;` },
+  { cat:"AGGREGATE", name:"HAVING", desc:"Filters grouped results (like WHERE for aggregate functions).", syntax:`<span class="kw">SELECT</span> dept, <span class="fn">COUNT</span>(*)\n<span class="kw">FROM</span> employees\n<span class="kw">GROUP BY</span> dept\n<span class="kw">HAVING COUNT</span>(*) > 5;` },
+  { cat:"AGGREGATE", name:"ROLLUP", desc:"Generates subtotals and grand totals for GROUP BY columns.", syntax:`<span class="kw">SELECT</span> region, dept, <span class="fn">SUM</span>(sales)\n<span class="kw">FROM</span> t\n<span class="kw">GROUP BY ROLLUP</span>(region, dept);` },
+  { cat:"AGGREGATE", name:"CUBE", desc:"Generates all possible subtotals for given GROUP BY dimensions.", syntax:`<span class="kw">GROUP BY CUBE</span>(region, dept, year)` },
+  { cat:"AGGREGATE", name:"GROUPING SETS", desc:"Defines specific grouping combinations explicitly.", syntax:`<span class="kw">GROUP BY GROUPING SETS</span>(\n  (region, dept),\n  (region),\n  ()\n)` },
+
+  // STRING
+  { cat:"STRING", name:"CONCAT()", desc:"Concatenates two or more strings.", syntax:`<span class="fn">CONCAT</span>(first_name, <span class="str">' '</span>, last_name)\n<span class="cm">-- Oracle / SQL Server also support || operator</span>` },
+  { cat:"STRING", name:"CONCAT_WS()", desc:"Concatenates with a separator, skipping NULLs.", syntax:`<span class="fn">CONCAT_WS</span>(<span class="str">', '</span>, city, state, zip)` },
+  { cat:"STRING", name:"LENGTH() / LEN()", desc:"Returns the number of characters in a string.", syntax:`<span class="fn">LENGTH</span>(col)   <span class="cm">-- MySQL, Oracle, PostgreSQL</span>\n<span class="fn">LEN</span>(col)      <span class="cm">-- SQL Server</span>` },
+  { cat:"STRING", name:"UPPER() / LOWER()", desc:"Converts a string to upper or lower case.", syntax:`<span class="fn">UPPER</span>(col)\n<span class="fn">LOWER</span>(col)` },
+  { cat:"STRING", name:"TRIM()", desc:"Removes leading/trailing whitespace or specified characters.", syntax:`<span class="fn">TRIM</span>(col)\n<span class="fn">LTRIM</span>(col)\n<span class="fn">RTRIM</span>(col)\n<span class="fn">TRIM</span>(<span class="str">'x'</span> <span class="kw">FROM</span> col)` },
+  { cat:"STRING", name:"SUBSTR() / SUBSTRING()", desc:"Extracts a substring from a string.", syntax:`<span class="fn">SUBSTR</span>(col, start, length)\n<span class="fn">SUBSTRING</span>(col <span class="kw">FROM</span> 1 <span class="kw">FOR</span> 5)` },
+  { cat:"STRING", name:"INSTR() / CHARINDEX()", desc:"Returns the position of a substring within a string.", syntax:`<span class="fn">INSTR</span>(col, <span class="str">'search'</span>)       <span class="cm">-- Oracle, MySQL</span>\n<span class="fn">CHARINDEX</span>(<span class="str">'search'</span>, col)  <span class="cm">-- SQL Server</span>\n<span class="fn">POSITION</span>(<span class="str">'x'</span> <span class="kw">IN</span> col)     <span class="cm">-- Standard SQL</span>` },
+  { cat:"STRING", name:"REPLACE()", desc:"Replaces all occurrences of a substring.", syntax:`<span class="fn">REPLACE</span>(col, <span class="str">'old'</span>, <span class="str">'new'</span>)` },
+  { cat:"STRING", name:"LPAD() / RPAD()", desc:"Left- or right-pads a string to a specified length.", syntax:`<span class="fn">LPAD</span>(col, 10, <span class="str">'0'</span>)\n<span class="fn">RPAD</span>(col, 10, <span class="str">' '</span>)` },
+  { cat:"STRING", name:"REGEXP_LIKE()", desc:"Checks if a string matches a regular expression pattern.", syntax:`<span class="kw">WHERE</span> <span class="fn">REGEXP_LIKE</span>(col, <span class="str">'^[A-Z]'</span>)` },
+  { cat:"STRING", name:"REGEXP_REPLACE()", desc:"Replaces substrings matching a regex pattern.", syntax:`<span class="fn">REGEXP_REPLACE</span>(col, <span class="str">'[0-9]'</span>, <span class="str">'#'</span>)` },
+  { cat:"STRING", name:"REGEXP_SUBSTR()", desc:"Extracts a substring matching a regex pattern.", syntax:`<span class="fn">REGEXP_SUBSTR</span>(col, <span class="str">'[A-Z]+'</span>, 1, 1)` },
+  { cat:"STRING", name:"INITCAP()", desc:"Converts the first letter of each word to uppercase.", syntax:`<span class="fn">INITCAP</span>(<span class="str">'hello world'</span>)  <span class="cm">-- → 'Hello World'</span>` },
+  { cat:"STRING", name:"REVERSE()", desc:"Reverses a string.", syntax:`<span class="fn">REVERSE</span>(<span class="str">'abc'</span>)  <span class="cm">-- → 'cba'</span>` },
+  { cat:"STRING", name:"SPLIT_PART()", desc:"Splits a string by a delimiter and returns the nth part (PostgreSQL / Snowflake).", syntax:`<span class="fn">SPLIT_PART</span>(<span class="str">'a,b,c'</span>, <span class="str">','</span>, 2)  <span class="cm">-- → 'b'</span>` },
+  { cat:"STRING", name:"LIKE / ILIKE", desc:"Pattern matching in WHERE clause. ILIKE is case-insensitive (PostgreSQL).", syntax:`<span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="str">'J%'</span>\n<span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="str">'_ohn'</span>\n<span class="kw">WHERE</span> name <span class="kw">ILIKE</span> <span class="str">'%john%'</span>` },
+
+  // DATE
+  { cat:"DATE", name:"TO_CHAR()", desc:"Converts a date/number to a formatted string (Oracle / PostgreSQL).", syntax:`<span class="fn">TO_CHAR</span>(sysdate, <span class="str">'YYYY-MM-DD'</span>)\n<span class="fn">TO_CHAR</span>(salary, <span class="str">'$999,999.00'</span>)` },
+  { cat:"DATE", name:"TO_DATE()", desc:"Converts a string to a DATE using a format mask.", syntax:`<span class="fn">TO_DATE</span>(<span class="str">'2024-01-15'</span>, <span class="str">'YYYY-MM-DD'</span>)\n<span class="fn">TO_DATE</span>(<span class="str">'15/01/2024'</span>, <span class="str">'DD/MM/YYYY'</span>)` },
+  { cat:"DATE", name:"TO_TIMESTAMP()", desc:"Converts a string to a TIMESTAMP value.", syntax:`<span class="fn">TO_TIMESTAMP</span>(<span class="str">'2024-01-15 10:30:00'</span>, <span class="str">'YYYY-MM-DD HH24:MI:SS'</span>)` },
+  { cat:"DATE", name:"SYSDATE / NOW()", desc:"Returns the current date and time.", syntax:`<span class="fn">SYSDATE</span>            <span class="cm">-- Oracle</span>\n<span class="fn">NOW</span>()              <span class="cm">-- MySQL, PostgreSQL</span>\n<span class="fn">GETDATE</span>()          <span class="cm">-- SQL Server</span>\n<span class="fn">CURRENT_TIMESTAMP</span>  <span class="cm">-- Standard SQL</span>` },
+  { cat:"DATE", name:"TRUNC() / DATE_TRUNC()", desc:"Truncates a date to a specified unit (removes time portion).", syntax:`<span class="fn">TRUNC</span>(sysdate, <span class="str">'MM'</span>)           <span class="cm">-- Oracle: first of month</span>\n<span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, now())   <span class="cm">-- PostgreSQL</span>` },
+  { cat:"DATE", name:"EXTRACT() / DATEPART()", desc:"Extracts a specific component (year, month, day, etc.) from a date.", syntax:`<span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> hire_date)\n<span class="fn">EXTRACT</span>(<span class="kw">MONTH FROM</span> order_date)\n<span class="fn">DATEPART</span>(year, hire_date)  <span class="cm">-- SQL Server</span>` },
+  { cat:"DATE", name:"ADD_MONTHS()", desc:"Adds a specified number of months to a date (Oracle).", syntax:`<span class="fn">ADD_MONTHS</span>(sysdate, 3)\n<span class="fn">ADD_MONTHS</span>(hire_date, -6)` },
+  { cat:"DATE", name:"DATEDIFF()", desc:"Returns the difference between two dates.", syntax:`<span class="fn">DATEDIFF</span>(day, start_date, end_date)  <span class="cm">-- SQL Server</span>\n<span class="fn">DATEDIFF</span>(end_date, start_date)       <span class="cm">-- MySQL</span>\nend_date - start_date                  <span class="cm">-- Oracle / PostgreSQL</span>` },
+  { cat:"DATE", name:"DATE_ADD() / DATEADD()", desc:"Adds an interval to a date.", syntax:`<span class="fn">DATE_ADD</span>(date_col, <span class="kw">INTERVAL</span> 7 <span class="kw">DAY</span>)   <span class="cm">-- MySQL</span>\n<span class="fn">DATEADD</span>(day, 7, date_col)             <span class="cm">-- SQL Server</span>` },
+  { cat:"DATE", name:"MONTHS_BETWEEN()", desc:"Returns the number of months between two dates (Oracle).", syntax:`<span class="fn">MONTHS_BETWEEN</span>(end_date, start_date)` },
+  { cat:"DATE", name:"LAST_DAY()", desc:"Returns the last day of the month for a given date.", syntax:`<span class="fn">LAST_DAY</span>(sysdate)` },
+  { cat:"DATE", name:"FORMAT() / TO_CHAR()", desc:"Formats a date value as a string.", syntax:`<span class="fn">FORMAT</span>(date_col, <span class="str">'yyyy-MM-dd'</span>)  <span class="cm">-- SQL Server</span>\n<span class="fn">TO_CHAR</span>(date_col, <span class="str">'YYYY-MM-DD'</span>) <span class="cm">-- Oracle</span>` },
+
+  // NUMERIC
+  { cat:"NUMERIC", name:"ROUND()", desc:"Rounds a number to a specified decimal place.", syntax:`<span class="fn">ROUND</span>(3.14159, 2)   <span class="cm">-- → 3.14</span>\n<span class="fn">ROUND</span>(salary, -3)  <span class="cm">-- round to thousands</span>` },
+  { cat:"NUMERIC", name:"TRUNC() / FLOOR()", desc:"Truncates a number (removes decimals without rounding).", syntax:`<span class="fn">TRUNC</span>(3.99)    <span class="cm">-- → 3 (Oracle)</span>\n<span class="fn">FLOOR</span>(3.99)    <span class="cm">-- → 3 (all DBs)</span>` },
+  { cat:"NUMERIC", name:"CEIL() / CEILING()", desc:"Rounds a number up to the nearest integer.", syntax:`<span class="fn">CEIL</span>(3.01)     <span class="cm">-- → 4</span>\n<span class="fn">CEILING</span>(3.01)  <span class="cm">-- SQL Server</span>` },
+  { cat:"NUMERIC", name:"ABS()", desc:"Returns the absolute (positive) value.", syntax:`<span class="fn">ABS</span>(-42)  <span class="cm">-- → 42</span>` },
+  { cat:"NUMERIC", name:"MOD()", desc:"Returns the remainder after division.", syntax:`<span class="fn">MOD</span>(10, 3)  <span class="cm">-- → 1</span>\n10 % 3       <span class="cm">-- SQL Server / MySQL</span>` },
+  { cat:"NUMERIC", name:"POWER()", desc:"Raises a number to the specified power.", syntax:`<span class="fn">POWER</span>(2, 10)  <span class="cm">-- → 1024</span>` },
+  { cat:"NUMERIC", name:"SQRT()", desc:"Returns the square root of a number.", syntax:`<span class="fn">SQRT</span>(144)  <span class="cm">-- → 12</span>` },
+  { cat:"NUMERIC", name:"LOG() / LN()", desc:"Returns the logarithm of a number.", syntax:`<span class="fn">LOG</span>(100)   <span class="cm">-- base 10 log</span>\n<span class="fn">LN</span>(2.718)  <span class="cm">-- natural log</span>` },
+  { cat:"NUMERIC", name:"SIGN()", desc:"Returns -1, 0, or 1 based on the sign of the value.", syntax:`<span class="fn">SIGN</span>(-50)  <span class="cm">-- → -1</span>\n<span class="fn">SIGN</span>(0)    <span class="cm">-- → 0</span>\n<span class="fn">SIGN</span>(50)   <span class="cm">-- → 1</span>` },
+
+  // CONVERSION
+  { cat:"CONVERSION", name:"CAST()", desc:"Explicitly converts a value to a different data type.", syntax:`<span class="kw">CAST</span>(col <span class="kw">AS</span> <span class="kw">VARCHAR</span>(50))\n<span class="kw">CAST</span>(<span class="str">'2024-01-01'</span> <span class="kw">AS DATE</span>)\n<span class="kw">CAST</span>(price <span class="kw">AS DECIMAL</span>(10,2))` },
+  { cat:"CONVERSION", name:"CONVERT()", desc:"Converts a value to a specified data type (SQL Server / MySQL).", syntax:`<span class="fn">CONVERT</span>(<span class="kw">VARCHAR</span>, date_col, 120)  <span class="cm">-- SQL Server</span>\n<span class="fn">CONVERT</span>(<span class="kw">DATE</span>, <span class="str">'2024-01-01'</span>)     <span class="cm">-- MySQL</span>` },
+  { cat:"CONVERSION", name:"TO_NUMBER()", desc:"Converts a string to a number (Oracle).", syntax:`<span class="fn">TO_NUMBER</span>(<span class="str">'1234.56'</span>)\n<span class="fn">TO_NUMBER</span>(<span class="str">'$1,234.56'</span>, <span class="str">'$9,999.99'</span>)` },
+  { cat:"CONVERSION", name:"TRY_CAST() / TRY_CONVERT()", desc:"Attempts conversion, returns NULL on failure instead of error (SQL Server).", syntax:`<span class="fn">TRY_CAST</span>(col <span class="kw">AS INT</span>)\n<span class="fn">TRY_CONVERT</span>(<span class="kw">DATE</span>, col)` },
+  { cat:"CONVERSION", name:"IMPLICIT CAST ::", desc:"PostgreSQL shorthand cast operator.", syntax:`col::<span class="kw">INT</span>\ncol::<span class="kw">TEXT</span>\ncol::<span class="kw">TIMESTAMP</span>` },
+
+  // WINDOW
+  { cat:"WINDOW", name:"ROW_NUMBER()", desc:"Assigns a unique sequential integer to each row within a partition.", syntax:`<span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>\n) <span class="kw">AS</span> rn` },
+  { cat:"WINDOW", name:"RANK()", desc:"Assigns rank with gaps for ties.", syntax:`<span class="fn">RANK</span>() <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>\n) <span class="kw">AS</span> rnk` },
+  { cat:"WINDOW", name:"DENSE_RANK()", desc:"Assigns rank without gaps for ties.", syntax:`<span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>\n)` },
+  { cat:"WINDOW", name:"NTILE()", desc:"Distributes rows into a specified number of approximately equal groups.", syntax:`<span class="fn">NTILE</span>(4) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> salary)  <span class="cm">-- quartiles</span>` },
+  { cat:"WINDOW", name:"LAG()", desc:"Accesses a value from a previous row within the partition.", syntax:`<span class="fn">LAG</span>(salary, 1, 0) <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> hire_date\n)` },
+  { cat:"WINDOW", name:"LEAD()", desc:"Accesses a value from a subsequent row within the partition.", syntax:`<span class="fn">LEAD</span>(salary, 1, 0) <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> hire_date\n)` },
+  { cat:"WINDOW", name:"FIRST_VALUE()", desc:"Returns the first value in an ordered window partition.", syntax:`<span class="fn">FIRST_VALUE</span>(salary) <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> hire_date\n  <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>\n)` },
+  { cat:"WINDOW", name:"LAST_VALUE()", desc:"Returns the last value in an ordered window partition.", syntax:`<span class="fn">LAST_VALUE</span>(salary) <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> hire_date\n  <span class="kw">ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING</span>\n)` },
+  { cat:"WINDOW", name:"SUM() OVER()", desc:"Running or partitioned sum as a window function.", syntax:`<span class="fn">SUM</span>(salary) <span class="kw">OVER</span> (\n  <span class="kw">PARTITION BY</span> dept\n  <span class="kw">ORDER BY</span> hire_date\n  <span class="kw">ROWS UNBOUNDED PRECEDING</span>\n) <span class="kw">AS</span> running_total` },
+  { cat:"WINDOW", name:"PARTITION BY", desc:"Divides rows into groups for window function calculations.", syntax:`<span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> dept <span class="kw">ORDER BY</span> salary)` },
+  { cat:"WINDOW", name:"ROWS / RANGE BETWEEN", desc:"Defines the window frame for a window function.", syntax:`<span class="kw">ROWS BETWEEN</span> 2 <span class="kw">PRECEDING AND CURRENT ROW</span>\n<span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</span>\n<span class="kw">RANGE BETWEEN INTERVAL</span> <span class="str">'7'</span> <span class="kw">DAY PRECEDING AND CURRENT ROW</span>` },
+
+  // CONDITIONAL
+  { cat:"CONDITIONAL", name:"CASE WHEN", desc:"Evaluates conditions and returns a value for the first match.", syntax:`<span class="kw">CASE</span>\n  <span class="kw">WHEN</span> salary > 100000 <span class="kw">THEN</span> <span class="str">'High'</span>\n  <span class="kw">WHEN</span> salary > 50000  <span class="kw">THEN</span> <span class="str">'Mid'</span>\n  <span class="kw">ELSE</span> <span class="str">'Low'</span>\n<span class="kw">END</span>` },
+  { cat:"CONDITIONAL", name:"IIF() / IF()", desc:"Inline conditional expression.", syntax:`<span class="fn">IIF</span>(salary > 50000, <span class="str">'High'</span>, <span class="str">'Low'</span>)  <span class="cm">-- SQL Server</span>\n<span class="fn">IF</span>(salary > 50000, <span class="str">'High'</span>, <span class="str">'Low'</span>)   <span class="cm">-- MySQL</span>` },
+  { cat:"CONDITIONAL", name:"DECODE()", desc:"Oracle shorthand for CASE WHEN equality checks.", syntax:`<span class="fn">DECODE</span>(status, <span class="str">'A'</span>, <span class="str">'Active'</span>, <span class="str">'I'</span>, <span class="str">'Inactive'</span>, <span class="str">'Unknown'</span>)` },
+  { cat:"CONDITIONAL", name:"GREATEST() / LEAST()", desc:"Returns the largest or smallest value from a list of expressions.", syntax:`<span class="fn">GREATEST</span>(col1, col2, col3)\n<span class="fn">LEAST</span>(col1, col2, col3)` },
+  { cat:"CONDITIONAL", name:"IN / NOT IN", desc:"Tests whether a value matches any value in a list or subquery.", syntax:`<span class="kw">WHERE</span> status <span class="kw">IN</span> (<span class="str">'A'</span>, <span class="str">'B'</span>, <span class="str">'C'</span>)\n<span class="kw">WHERE</span> id <span class="kw">NOT IN</span> (<span class="kw">SELECT</span> id <span class="kw">FROM</span> excluded)` },
+  { cat:"CONDITIONAL", name:"BETWEEN", desc:"Tests whether a value is within an inclusive range.", syntax:`<span class="kw">WHERE</span> salary <span class="kw">BETWEEN</span> 50000 <span class="kw">AND</span> 100000\n<span class="kw">WHERE</span> hire_date <span class="kw">BETWEEN</span> <span class="str">'2020-01-01'</span> <span class="kw">AND</span> <span class="str">'2023-12-31'</span>` },
+  { cat:"CONDITIONAL", name:"EXISTS / NOT EXISTS", desc:"Tests whether a subquery returns any rows.", syntax:`<span class="kw">WHERE EXISTS</span> (\n  <span class="kw">SELECT</span> 1 <span class="kw">FROM</span> orders o\n  <span class="kw">WHERE</span> o.customer_id = c.id\n)` },
+
+  // SUBQUERY / CTE
+  { cat:"SUBQUERY", name:"WITH (CTE)", desc:"Common Table Expression — defines a named temporary result set.", syntax:`<span class="kw">WITH</span> cte_name <span class="kw">AS</span> (\n  <span class="kw">SELECT</span> dept, <span class="fn">AVG</span>(salary) avg_sal\n  <span class="kw">FROM</span> employees\n  <span class="kw">GROUP BY</span> dept\n)\n<span class="kw">SELECT</span> * <span class="kw">FROM</span> cte_name;` },
+  { cat:"SUBQUERY", name:"Recursive CTE", desc:"A CTE that references itself to process hierarchical or recursive data.", syntax:`<span class="kw">WITH RECURSIVE</span> tree <span class="kw">AS</span> (\n  <span class="kw">SELECT</span> id, parent_id, name, 1 <span class="kw">AS</span> lvl\n  <span class="kw">FROM</span> org <span class="kw">WHERE</span> parent_id <span class="kw">IS NULL</span>\n  <span class="kw">UNION ALL</span>\n  <span class="kw">SELECT</span> o.id, o.parent_id, o.name, t.lvl+1\n  <span class="kw">FROM</span> org o\n  <span class="kw">JOIN</span> tree t <span class="kw">ON</span> o.parent_id = t.id\n)\n<span class="kw">SELECT</span> * <span class="kw">FROM</span> tree;` },
+  { cat:"SUBQUERY", name:"Scalar Subquery", desc:"A subquery that returns a single value, used in SELECT or WHERE.", syntax:`<span class="kw">SELECT</span> name,\n  (<span class="kw">SELECT MAX</span>(salary) <span class="kw">FROM</span> employees) <span class="kw">AS</span> max_sal\n<span class="kw">FROM</span> employees;` },
+  { cat:"SUBQUERY", name:"Correlated Subquery", desc:"A subquery that references columns from the outer query.", syntax:`<span class="kw">SELECT</span> e.name, e.salary\n<span class="kw">FROM</span> employees e\n<span class="kw">WHERE</span> e.salary > (\n  <span class="kw">SELECT AVG</span>(salary)\n  <span class="kw">FROM</span> employees\n  <span class="kw">WHERE</span> dept = e.dept\n);` },
+  { cat:"SUBQUERY", name:"Derived Table", desc:"An inline subquery used in the FROM clause as a virtual table.", syntax:`<span class="kw">SELECT</span> d.dept, d.avg_sal\n<span class="kw">FROM</span> (\n  <span class="kw">SELECT</span> dept, <span class="fn">AVG</span>(salary) avg_sal\n  <span class="kw">FROM</span> employees\n  <span class="kw">GROUP BY</span> dept\n) d\n<span class="kw">WHERE</span> d.avg_sal > 60000;` },
+
+  // NULL
+  { cat:"NULL", name:"IS NULL / IS NOT NULL", desc:"Tests whether a value is NULL.", syntax:`<span class="kw">WHERE</span> col <span class="kw">IS NULL</span>\n<span class="kw">WHERE</span> col <span class="kw">IS NOT NULL</span>` },
+  { cat:"NULL", name:"NVL()", desc:"Replaces NULL with a specified value (Oracle).", syntax:`<span class="fn">NVL</span>(commission, 0)\n<span class="fn">NVL</span>(col, <span class="str">'N/A'</span>)` },
+  { cat:"NULL", name:"NVL2()", desc:"Returns different values based on whether expression is NULL (Oracle).", syntax:`<span class="fn">NVL2</span>(commission, salary + commission, salary)` },
+  { cat:"NULL", name:"COALESCE()", desc:"Returns the first non-NULL value in a list. Standard SQL.", syntax:`<span class="fn">COALESCE</span>(col1, col2, col3, <span class="str">'default'</span>)` },
+  { cat:"NULL", name:"NULLIF()", desc:"Returns NULL if two expressions are equal; otherwise returns the first.", syntax:`<span class="fn">NULLIF</span>(col, 0)         <span class="cm">-- avoids divide-by-zero</span>\n<span class="fn">NULLIF</span>(status, <span class="str">'N/A'</span>)` },
+  { cat:"NULL", name:"ISNULL()", desc:"Returns a replacement value if the expression is NULL (SQL Server / MySQL).", syntax:`<span class="fn">ISNULL</span>(col, 0)         <span class="cm">-- SQL Server</span>\n<span class="fn">IFNULL</span>(col, 0)         <span class="cm">-- MySQL</span>` },
+
+  // SET
+  { cat:"SET", name:"UNION", desc:"Combines results of two queries, removing duplicates.", syntax:`<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_a\n<span class="kw">UNION</span>\n<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_b;` },
+  { cat:"SET", name:"UNION ALL", desc:"Combines results of two queries, keeping all duplicates.", syntax:`<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_a\n<span class="kw">UNION ALL</span>\n<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_b;` },
+  { cat:"SET", name:"INTERSECT", desc:"Returns rows that appear in both queries.", syntax:`<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_a\n<span class="kw">INTERSECT</span>\n<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_b;` },
+  { cat:"SET", name:"EXCEPT / MINUS", desc:"Returns rows in the first query that don't appear in the second.", syntax:`<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_a\n<span class="kw">EXCEPT</span>\n<span class="kw">SELECT</span> col <span class="kw">FROM</span> table_b;\n<span class="cm">-- MINUS used in Oracle</span>` },
+
+  // ANALYTIC
+  { cat:"ANALYTIC", name:"PERCENT_RANK()", desc:"Returns the relative rank of a row as a percentage (0 to 1).", syntax:`<span class="fn">PERCENT_RANK</span>() <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> salary)` },
+  { cat:"ANALYTIC", name:"CUME_DIST()", desc:"Returns the cumulative distribution of a value within a partition.", syntax:`<span class="fn">CUME_DIST</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> dept <span class="kw">ORDER BY</span> salary)` },
+  { cat:"ANALYTIC", name:"PERCENTILE_CONT()", desc:"Calculates a continuous percentile value within a group.", syntax:`<span class="fn">PERCENTILE_CONT</span>(0.5) <span class="kw">WITHIN GROUP</span>\n  (<span class="kw">ORDER BY</span> salary) <span class="kw">AS</span> median` },
+  { cat:"ANALYTIC", name:"PERCENTILE_DISC()", desc:"Calculates a discrete percentile (returns an actual data value).", syntax:`<span class="fn">PERCENTILE_DISC</span>(0.5) <span class="kw">WITHIN GROUP</span>\n  (<span class="kw">ORDER BY</span> salary)` },
+  { cat:"ANALYTIC", name:"MEDIAN()", desc:"Returns the median value of an expression (Oracle / Snowflake).", syntax:`<span class="fn">MEDIAN</span>(salary) <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> dept)` },
+  { cat:"ANALYTIC", name:"STDDEV() / VARIANCE()", desc:"Statistical standard deviation and variance.", syntax:`<span class="fn">STDDEV</span>(salary)\n<span class="fn">VARIANCE</span>(salary)\n<span class="fn">STDDEV_POP</span>(salary)   <span class="cm">-- population</span>\n<span class="fn">STDDEV_SAMP</span>(salary)  <span class="cm">-- sample</span>` },
+
+  // MISC
+  { cat:"MISC", name:"DISTINCT", desc:"Removes duplicate rows from a result set.", syntax:`<span class="kw">SELECT DISTINCT</span> dept <span class="kw">FROM</span> employees;` },
+  { cat:"MISC", name:"TOP / LIMIT / FETCH", desc:"Limits the number of rows returned.", syntax:`<span class="kw">TOP</span> 10                          <span class="cm">-- SQL Server</span>\n<span class="kw">LIMIT</span> 10                        <span class="cm">-- MySQL, PostgreSQL</span>\n<span class="kw">FETCH FIRST</span> 10 <span class="kw">ROWS ONLY</span>       <span class="cm">-- Oracle, DB2</span>\n<span class="kw">LIMIT</span> 10 <span class="kw">OFFSET</span> 20             <span class="cm">-- with paging</span>` },
+  { cat:"MISC", name:"ORDER BY", desc:"Sorts the result set by one or more columns.", syntax:`<span class="kw">ORDER BY</span> col1 <span class="kw">ASC</span>, col2 <span class="kw">DESC</span>\n<span class="kw">ORDER BY</span> 1, 2  <span class="cm">-- by column position</span>` },
+  { cat:"MISC", name:"PIVOT", desc:"Rotates rows into columns (SQL Server / Oracle).", syntax:`<span class="kw">SELECT</span> * <span class="kw">FROM</span> sales_data\n<span class="kw">PIVOT</span> (\n  <span class="fn">SUM</span>(amount)\n  <span class="kw">FOR</span> quarter <span class="kw">IN</span> ([Q1], [Q2], [Q3], [Q4])\n);` },
+  { cat:"MISC", name:"UNPIVOT", desc:"Rotates columns back into rows.", syntax:`<span class="kw">SELECT</span> * <span class="kw">FROM</span> quarterly\n<span class="kw">UNPIVOT</span> (\n  amount <span class="kw">FOR</span> quarter <span class="kw">IN</span> (Q1, Q2, Q3, Q4)\n);` },
+  { cat:"MISC", name:"EXPLAIN / EXPLAIN PLAN", desc:"Shows the query execution plan for performance analysis.", syntax:`<span class="kw">EXPLAIN</span> <span class="kw">SELECT</span> * <span class="kw">FROM</span> employees;\n<span class="kw">EXPLAIN PLAN FOR</span> <span class="kw">SELECT</span> * <span class="kw">FROM</span> employees; <span class="cm">-- Oracle</span>` },
+  { cat:"MISC", name:"CONNECT BY (Oracle)", desc:"Hierarchical query clause to traverse tree structures.", syntax:`<span class="kw">SELECT</span> LEVEL, id, name\n<span class="kw">FROM</span> employees\n<span class="kw">START WITH</span> manager_id <span class="kw">IS NULL</span>\n<span class="kw">CONNECT BY PRIOR</span> id = manager_id;` },
+  { cat:"MISC", name:"FOR UPDATE", desc:"Locks selected rows for the duration of the transaction.", syntax:`<span class="kw">SELECT</span> * <span class="kw">FROM</span> accounts\n<span class="kw">WHERE</span> id = 42\n<span class="kw">FOR UPDATE</span>;` },
+  { cat:"MISC", name:"ROWNUM / ROW_NUMBER", desc:"Pseudo-column (Oracle) or function that numbers rows.", syntax:`<span class="kw">WHERE ROWNUM</span> <= 10  <span class="cm">-- Oracle legacy</span>\n<span class="cm">-- Prefer ROW_NUMBER() OVER() in modern SQL</span>` },
+  { cat:"MISC", name:"ANY / ALL", desc:"Compares a value to any or all values in a subquery.", syntax:`<span class="kw">WHERE</span> salary > <span class="kw">ANY</span> (<span class="kw">SELECT</span> salary <span class="kw">FROM</span> managers)\n<span class="kw">WHERE</span> salary > <span class="kw">ALL</span> (<span class="kw">SELECT</span> salary <span class="kw">FROM</span> managers)` },
+  { cat:"MISC", name:"LATERAL / APPLY", desc:"Allows a subquery to reference columns from the preceding table.", syntax:`<span class="kw">SELECT</span> e.*, t.top_sale\n<span class="kw">FROM</span> employees e\n<span class="kw">CROSS JOIN LATERAL</span> (\n  <span class="kw">SELECT MAX</span>(amount) top_sale\n  <span class="kw">FROM</span> sales\n  <span class="kw">WHERE</span> sales.emp_id = e.id\n) t;\n<span class="cm">-- CROSS APPLY / OUTER APPLY in SQL Server</span>` },
+];
+
+// ---- Build UI ----
+const catColors = {};
+Object.entries(CATEGORIES).forEach(([k,v]) => { catColors[k] = v.color; });
+
+const cats = [...new Set(DATA.map(d => d.cat))];
+
+// Add filter buttons
+const filtersEl = document.getElementById('filters');
+cats.forEach(cat => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn';
+  btn.dataset.cat = cat;
+  btn.textContent = cat;
+  btn.style.setProperty('--cat-color', catColors[cat] || '#64748b');
+  filtersEl.appendChild(btn);
+});
+
+// Render glossary
+function render(query = '', activeCat = 'all') {
+  const glossary = document.getElementById('glossary');
+  glossary.innerHTML = '';
+  const noResults = document.getElementById('no-results');
+  const q = query.toLowerCase();
+
+  let totalVisible = 0;
+  const catGroups = {};
+
+  DATA.forEach(item => {
+    const matchesSearch = !q ||
+      item.name.toLowerCase().includes(q) ||
+      item.desc.toLowerCase().includes(q) ||
+      item.cat.toLowerCase().includes(q);
+    const matchesCat = activeCat === 'all' || item.cat === activeCat;
+    if (matchesSearch && matchesCat) {
+      if (!catGroups[item.cat]) catGroups[item.cat] = [];
+      catGroups[item.cat].push(item);
+      totalVisible++;
+    }
+  });
+
+  document.getElementById('visible-count').textContent = totalVisible;
+  document.getElementById('total-count').textContent = DATA.length;
+
+  if (totalVisible === 0) {
+    noResults.classList.add('show');
+    return;
+  }
+  noResults.classList.remove('show');
+
+  Object.entries(catGroups).forEach(([cat, items]) => {
+    const info = CATEGORIES[cat] || { label: cat, color: '#64748b' };
+    const section = document.createElement('div');
+    section.className = 'category-section';
+
+    section.innerHTML = `
+      <div class="category-header">
+        <span class="cat-dot" style="background:${info.color}"></span>
+        <h2>${info.label}</h2>
+        <span class="cat-count">${items.length}</span>
+      </div>
+      <div class="cards-grid" id="grid-${cat}"></div>
+    `;
+    glossary.appendChild(section);
+
+    const grid = section.querySelector('.cards-grid');
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.setProperty('--card-accent', info.color);
+      card.innerHTML = `
+        <style>.card[data-cat="${item.cat}"]::before{background:linear-gradient(90deg,${info.color},transparent)}</style>
+        <div class="card-top">
+          <span class="card-name">${item.name}</span>
+          <span class="badge" style="background:${info.color}18;color:${info.color};border:1px solid ${info.color}33">${item.cat}</span>
+        </div>
+        <div class="card-desc">${item.desc}</div>
+        <div class="card-syntax">${item.syntax}</div>
+      `;
+      card.dataset.cat = item.cat;
+      card.addEventListener('click', () => card.classList.toggle('open'));
+      grid.appendChild(card);
+    });
+  });
+}
+
+// Search
+let activeCat = 'all';
+document.getElementById('search').addEventListener('input', e => {
+  render(e.target.value, activeCat);
+});
+
+// Filter buttons
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+  render(document.getElementById('search').value, activeCat);
+});
+
+render();
+</script>
+</body>
+</html>
